@@ -1,15 +1,29 @@
 K, M, N = [int(i) for i in input().split(" ")]
 
 patches = []
-nhoj_cows =[]
+nhoj_cows = []
 
-for i in range(K):
+for i in range(K):                              # O(K)
     p_i, t_i = [int(i) for i in input().split(" ")]
 
-    patches.append([p_i, t_i])
+    patches.append([p_i, t_i, float("-inf"), float("inf")])
 
-for i in range(M):
+prev = 0
+idx = 0
+
+for i in range(M):                              # O(M)
+    # cow_pos = int(input())
+    # if patches[idx][0] - abs(patches[idx][0] - cow_pos) >= patches[idx][2]:
+    #     patches[idx][2] = patches[idx][0] - abs(patches[idx][0] - cow_pos)
+    #     patches[idx][3] = patches[idx][0] + abs(patches[idx][0] - cow_pos)
+
+    # else:
+    #     idx += 1
+    #     patches[idx][2] = patches[idx][0] - abs(patches[idx][0] - prev)
+    #     patches[idx][3] = patches[idx][0] + abs(patches[idx][0] - prev)
+    # prev = cow_pos
     nhoj_cows.append(int(input()))
+
 
 def find_nearest_cow(patch_pos:int, cows:list, idx:int):
     diff = float("inf");
@@ -23,25 +37,25 @@ def find_nearest_cow(patch_pos:int, cows:list, idx:int):
 if __name__ == "__main__":
     idx = 0
 
-    intervals = []
-
-    for i in range(len(patches)):
+    i = 0
+    while i < len(patches):                     # O(M+K)
         dist_closest, idx = find_nearest_cow(patches[i][0], nhoj_cows, idx)
-        intervals.append([patches[i][1], patches[i][0] - dist_closest, patches[i][0] + dist_closest])
+        patches[i] = [patches[i][0], patches[i][1], patches[i][0] - dist_closest, patches[i][0] + dist_closest]
 
-        if i != 0 and intervals[-1][1] < intervals[-2][2]:
-            last = intervals.pop()
-            sec_last = intervals.pop()
+        if i != 0 and patches[i][2] < patches[i-1][3]:
+            bef = patches[i-1]
 
-            new_interval = [last[0] + sec_last[0], sec_last[1], sec_last[2]]
-            intervals.append(new_interval)
+            patches[i] = [0, patches[i][1] + bef[1], patches[i][2], bef[3]]
+            patches.pop(i-1)
+        
+        else: i += 1
 
-    intervals = sorted(intervals, key=lambda x: x[0], reverse=True)
+    patches = sorted(patches, key=lambda x: x[1], reverse=True)
 
     taste_sum = 0
 
-    for j in range(N):
-        taste_sum += intervals[j][0]
+    for j in range(N):                          #O(N)
+        taste_sum += patches[j][1]
 
     print(taste_sum)
 
